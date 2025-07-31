@@ -2,94 +2,148 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>profit.ai — AI-диалог с аналитикой</title>
-  <meta property="og:title" content="profit.ai — AI-диалог с аналитикой" />
-  <meta property="og:image" content="https://dirty-fish.github.io/profit.ai/image.png" />
-    <meta name="twitter:image" content="https://dirty-fish.github.io/profit.ai/image.png" />
-    <meta property="og:description" content="Интерактивный чат с ИИ и аналитикой продаж. Работает без фреймворков." />
-    <meta property="og:url" content="https://dirty-fish.github.io/profit.ai/" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PROFIT AI</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #f2f2f2;
-      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff;
+      color: #000;
+      overflow-x: hidden;
+    }
+    body.menu-open { overflow: hidden; }
+    header {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
     }
-    .chat-box {
-      background: white;
-      max-width: 600px;
+    .logo { font-weight: bold; letter-spacing: 0.2em; }
+    .menu-button {
+      font-size: 28px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .menu {
+      position: fixed;
+      top: 0;
+      right: 0;
       width: 100%;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      max-width: 300px;
+      height: 100%;
+      background: #fff;
+      padding: 100px 24px 24px;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
     }
+    .menu.open { transform: translateX(0); }
+    .menu a {
+      display: block;
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: black;
+      text-decoration: none;
+    }
+    .backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.1);
+      z-index: 999;
+    }
+    .backdrop.show { display: block; }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    @media (min-width: 1000px) {
+      .container { max-width: 900px; padding: 40px; }
+    }
+    .chat-box { padding: 16px 0; }
     .msg {
-      margin: 12px 0;
+      max-width: 80%;
       padding: 12px 16px;
       border-radius: 16px;
-      max-width: 75%;
+      margin: 12px 0;
       line-height: 1.4;
       white-space: pre-wrap;
       animation: fadeIn 0.3s ease-out;
     }
-    .user {
-      background: #d6eaff;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-    .bot {
-      background: #eee;
-      align-self: flex-start;
-      margin-right: auto;
-    }
+    .user { background: #d6eaff; margin-left: auto; }
+    .bot { background: #eee; margin-right: auto; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .section {
+      padding: 24px 0;
+      font-size: 18px;
+    }
+    .section h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    .highlight { color: #0057ff; }
+    .image-container {
+      padding: 24px 0;
+      text-align: center;
+    }
+    .image-container img {
+      max-width: 100%;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="chat-box" id="chat"></div>
+  <div class="backdrop" id="backdrop" onclick="toggleMenu()"></div>
+
+  <header>
+    <div class="logo">P R O F I T &nbsp; A I</div>
+    <button class="menu-button" onclick="toggleMenu()" aria-label="Открыть меню">&#9776;</button>
+  </header>
+
+  <div class="menu" id="menu">
+    <a href="#" onclick="goTo('project')">Project</a>
+    <a href="#" onclick="goTo('research')">Research</a>
+    <a href="#" onclick="goTo('contact')">Contact</a>
+  </div>
+
+  <main id="main">
+    <div class="container">
+      <div class="chat-box" id="chat"></div>
+
+      <div class="section">
+        <h2>Opening space for <span class="highlight">meaningful dialogue</span><br>at the forefront of <span class="highlight">technological innovation</span>.</h2>
+        <p class="section">Flexible Architecture<br>The result is a modular environment that can be re-arranged and perceived in new ways to tell new stories, allowing for a truly scalable interactive experience.</p>
+      </div>
+      <div class="image-container">
+        <img src="https://dirty-fish.github.io/profit.ai/image.png" alt="Architecture" loading="lazy" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </main>
 
   <script>
-    const chat = document.getElementById('chat');
-
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function typePrint(text, role) {
-      const div = document.createElement('div');
-      div.className = `msg ${role}`;
-      chat.appendChild(div);
-
-      let buffer = '';
-      for (let i = 0; i < text.length; i++) {
-        buffer += text[i];
-        div.textContent = buffer;
-
-        const c = text[i];
-        const isPause = /[.,?!…]/.test(c);
-        const baseDelay = role === 'user' ? 60 : 25;
-        const extraDelay = isPause ? 150 : 0;
-
-        await sleep(baseDelay + Math.random() * 40 + extraDelay);
-      }
-
-      chat.scrollTop = chat.scrollHeight;
+    function getFormattedTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     const steps = [
       ["Ты", "61116099"],
       ["Бот", "О да! Есть такой артикул. Спрашивай, друг!"],
       ["Ты", "Где сейчас находится мой товар в выдаче, и как это влияет на продажи?"],
-      ["Бот", "— В среднем ваш товар появляется на позиции 27.4.\n— Охват А: 64% (17:39). В группе B — позиция 4.7, охват 83%.\n— Топ-10 = x3 продажи. Потеря 1 позиции ≈ −2.3% продаж.\n— 78% показов без рекламы. Топ-10 достигается при adv_price > 212 руб.\n— Динамика охвата — положительная."],
+      ["Бот", `— В среднем ваш товар появляется на позиции 27.4.
+— Охват А: 64% (${getFormattedTime()}). В группе B — позиция 4.7, охват 83%.
+— Топ-10 = x3 продажи. Потеря 1 позиции ≈ −2.3% продаж.
+— 78% показов без рекламы. Топ-10 достигается при adv_price > 212 руб.
+— Динамика охвата — положительная.`],
       ["Ты", "Стоит ли мне платить за рекламу, и когда?"],
       ["Бот", "— Средний оправданный adv_price: 127 руб (+18% продаж).\n— ROI положителен на позициях 8–20, выше 40 — отрицательный.\n— Эластичность: +1.4% заказов на 1 руб вложений."],
       ["Ты", "Кто со мной рядом, и насколько я выигрываю по цене?"],
@@ -99,16 +153,52 @@
       ["Бот", "🔚 Сформируем API-запрос и прогноз?"]
     ];
 
-    async function run() {
+    async function typePrint(text, role) {
+      const chat = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+      chat.appendChild(div);
+      let buffer = '';
+      for (let i = 0; i < text.length; i++) {
+        buffer += text[i];
+        div.textContent = buffer;
+        const c = text[i];
+        const pause = /[.,?!…]/.test(c) ? 150 : 0;
+        await new Promise(r => setTimeout(r, 25 + Math.random() * 40 + pause));
+      }
+      requestAnimationFrame(() => {
+        chat.scrollTop = chat.scrollHeight;
+      });
+    }
+
+    async function runChat() {
+      const chat = document.getElementById('chat');
+      chat.innerHTML = '';
       for (let [role, text] of steps) {
-        await sleep(800);
+        await new Promise(r => setTimeout(r, 500));
         const roleClass = role.toLowerCase() === 'бот' ? 'bot' : 'user';
         await typePrint(text, roleClass);
-        if (roleClass === 'bot') await sleep(1000);
       }
     }
 
-    run();
+    function toggleMenu() {
+      const menu = document.getElementById('menu');
+      const backdrop = document.getElementById('backdrop');
+      menu.classList.toggle('open');
+      backdrop.classList.toggle('show');
+      document.body.classList.toggle('menu-open');
+    }
+
+    function goTo(section) {
+      toggleMenu();
+      if (section === 'project') {
+        window.location.href = '/'; // можно заменить на './' если используется file://
+      } else {
+        alert(section + ' clicked');
+      }
+    }
+
+    runChat();
   </script>
 </body>
 </html>
